@@ -1,0 +1,19 @@
+{
+  "name": "biman-org",
+  "version": "1.0.0",
+  "description": "Portfolio website for Biman Ranasinghe",
+  "main": "index.html",
+  "scripts": {
+    "dev": "echo 'Open index.html in browser'",
+    "build": "echo 'No build step required for static site'"
+  },
+  "keywords": [
+    "portfolio",
+    "static"
+  ],
+  "author": "Biman Ranasinghe",
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}

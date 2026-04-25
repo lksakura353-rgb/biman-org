@@ -1,0 +1,18 @@
+{
+  "name": "biman-portfolio",
+  "version": "1.0.0",
+  "description": "Portfolio of Biman Ranasinghe - Content Creator",
+  "type": "module",
+  "scripts": {
+    "build": "echo 'Static site - no build needed'"
+  },
+  "keywords": [
+    "portfolio",
+    "vercel"
+  ],
+  "author": "Biman Ranasinghe",
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}

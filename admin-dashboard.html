@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Biman Ranasinghe</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --bg-card: rgba(20, 20, 25, 0.7);
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --border-soft: rgba(255, 255, 255, 0.05);
+            --radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Space Background Elements */
+        .space-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 10% 10%, #1e1b4b 0%, #050505 50%); z-index: -1; }
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.3; z-index: -1; }
+
+        /* Sidebar */
+        .admin-sidebar {
+            width: 280px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-soft);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            z-index: 10;
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            padding-left: 10px;
+        }
+
+        .admin-logo i {
+            font-size: 1.5rem;
+            color: var(--accent-purple);
+        }
+
+        .admin-logo span {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .nav-group {
+            margin-bottom: 25px;
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            padding-left: 15px;
+            font-weight: 700;
+        }
+
+        .admin-nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: var(--text-dim);
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 5px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .admin-nav-item i {
+            width: 20px;
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
+
+        .admin-nav-item:hover, .admin-nav-item.active {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--accent-purple);
+        }
+
+        .admin-nav-item.active {
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        /* Main Content */
+        .admin-main {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .header-title h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .header-title p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-soft);
+            border-radius: 20px;
+            padding: 25px;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-purple);
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--accent-purple);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .stat-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-info p {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .stat-change {
+            font-size: 0.75rem;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-change.up { color: #10b981; }
+        .stat-change.down { color: #ef4444; }
+
+        /* Charts Section */
+        .admin-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .admin-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-soft);
+            border-radius: 24px;
+            padding: 30px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .card-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* Tables */
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .admin-table th {
+            text-align: left;
+            padding: 15px;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .admin-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-soft);
+            font-size: 0.9rem;
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-active { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .status-pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+
+        /* Content Management Styles */
+        .content-view { display: none; }
+        .content-view.active { display: block; }
+
+        .action-icon {
+            padding: 8px;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .action-icon:hover { color: var(--text-main); }
+
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .admin-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar { display: none; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+
+        /* 3D Tilt Card Styles */
+        .tilt-card {
+            transform-style: preserve-3d;
+            transform: perspective(1000px);
+        }
+
+        .tilt-card [data-tilt] {
+            transform: preserve-3d;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="space-bg"></div>
+    <div class="stars"></div>
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="admin-logo">
+            <i class="fa-solid fa-gauge-high"></i>
+            <span>Site Admin</span>
+        </div>
+
+        <div class="nav-group">
+            <p class="nav-label">Main</p>
+            <div class="admin-nav-item active" onclick="showAdminView('overview', this)">
+                <i class="fa-solid fa-house"></i> Overview
+            </div>
+            <div class="admin-nav-item" onclick="showAdminView('analytics', this)">
+                <i class="fa-solid fa-chart-line"></i> Analytics
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <p class="nav-label">Management</p>
+            <div class="admin-nav-item" onclick="showAdminView('users', this)">
+                <i class="fa-solid fa-users"></i> User Manager
+            </div>
+            <div class="admin-nav-item" onclick="showAdminView('projects', this)">
+                <i class="fa-solid fa-layer-group"></i> Project Flow
+            </div>
+            <div class="admin-nav-item" onclick="showAdminView('services', this)">
+                <i class="fa-solid fa-briefcase"></i> Services
+            </div>
+            <div class="admin-nav-item" onclick="showAdminView('testimonials', this)">
+                <i class="fa-solid fa-star"></i> Testimonials
+            </div>
+            <div class="admin-nav-item" onclick="showAdminView('blog', this)">
+                <i class="fa-solid fa-newspaper"></i> Blog Posts
+            </div>
+            <div class="admin-nav-item" onclick="showAdminView('subscribers', this)">
+                <i class="fa-solid fa-envelope-open-text"></i> Email Subs
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <p class="nav-label">System</p>
+            <div class="admin-nav-item" onclick="showAdminView('settings', this)">
+                <i class="fa-solid fa-sliders"></i> Site Settings
+            </div>
+            <a href="index.html" class="admin-nav-item">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Exit Admin
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        
+        <header class="admin-header">
+            <div class="header-title">
+                <h1 id="admin-view-title">Dashboard Overview</h1>
+                <p id="admin-view-desc">Monitor your site's performance and manage your professional business.</p>
+            </div>
+            <div class="header-actions">
+                <button style="padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border-soft); background: var(--bg-card); color: white; cursor: pointer;">
+                    <i class="fa-solid fa-download"></i> Export Report
+                </button>
+            </div>
+        </header>
+
+        <!-- OVERVIEW VIEW -->
+        <div id="admin-overview" class="content-view active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-dollar-sign"></i></div>
+                    <div class="stat-info">
+                        <h3>$12,450</h3>
+                        <p>Total Revenue</p>
+                    </div>
+                    <div class="stat-change up"><i class="fa-solid fa-arrow-up"></i> 12% vs last month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-eye"></i></div>
+                    <div class="stat-info">
+                        <h3>8,245</h3>
+                        <p>Site Visitors</p>
+                    </div>
+                    <div class="stat-change up"><i class="fa-solid fa-arrow-up"></i> 24% vs last month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                    <div class="stat-info">
+                        <h3>154</h3>
+                        <p>Active Clients</p>
+                    </div>
+                    <div class="stat-change up"><i class="fa-solid fa-arrow-up"></i> 5 new today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
+                    <div class="stat-info">
+                        <h3>12</h3>
+                        <p>Pending Projects</p>
+                    </div>
+                    <div class="stat-change down"><i class="fa-solid fa-arrow-down"></i> 2% vs last month</div>
+                </div>
+            </div>
+
+            <div class="admin-row">
+                <div class="admin-card">
+                    <div class="card-header">
+                        <h2>Traffic Analytics</h2>
+                        <select style="background: transparent; color: white; border: 1px solid var(--border-soft); padding: 5px; border-radius: 5px;">
+                            <option>Last 7 Days</option>
+                            <option>Last 30 Days</option>
+                        </select>
+                    </div>
+                    <canvas id="trafficChart" height="150"></canvas>
+                </div>
+                <div class="admin-card">
+                    <div class="card-header">
+                        <h2>Top Services</h2>
+                    </div>
+                    <canvas id="servicesChart" height="250"></canvas>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <div class="card-header">
+                    <h2>Recent Activities</h2>
+                    <button style="color: var(--accent-purple); background: transparent; border: none; cursor: pointer;">View All</button>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Target</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="user-pill">
+                                    <div class="user-avatar">JD</div>
+                                    <span>John Doe</span>
+                                </div>
+                            </td>
+                            <td>Uploaded File</td>
+                            <td>Project_v2.zip</td>
+                            <td>2 mins ago</td>
+                            <td><span class="status-badge status-active">SUCCESS</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="user-pill">
+                                    <div class="user-avatar" style="background: #a855f7;">RS</div>
+                                    <span>Rahul Sharma</span>
+                                </div>
+                            </td>
+                            <td>New Review</td>
+                            <td>Feedback System</td>
+                            <td>1 hour ago</td>
+                            <td><span class="status-badge status-pending">PENDING</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- USERS VIEW -->
+        <div id="admin-users" class="content-view">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h2>Manage Users</h2>
+                    <input type="text" placeholder="Search users..." style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-soft); color: white; padding: 8px 15px; border-radius: 10px;">
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Join Date</th>
+                            <th>Projects</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>John Doe</td>
+                            <td>john@example.com</td>
+                            <td>Apr 12, 2026</td>
+                            <td>3</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <i class="fa-solid fa-pen-to-square action-icon"></i>
+                                <i class="fa-solid fa-trash-can action-icon" style="color: #ef4444;"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Sarah Wilson</td>
+                            <td>sarah@work.com</td>
+                            <td>Apr 15, 2026</td>
+                            <td>1</td>
+                            <td><span class="status-badge status-pending">Suspended</span></td>
+                            <td>
+                                <i class="fa-solid fa-pen-to-square action-icon"></i>
+                                <i class="fa-solid fa-trash-can action-icon" style="color: #ef4444;"></i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- BLOG MANAGEMENT -->
+        <div id="admin-blog" class="content-view">
+             <div class="admin-header" style="margin-bottom: 20px;">
+                 <h2>Manage Blog Content</h2>
+                 <button style="background: var(--accent-purple); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">
+                     <i class="fa-solid fa-plus"></i> New Post
+                 </button>
+             </div>
+             <div class="admin-card">
+                 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                     <!-- Blog Admin Card 1 -->
+                     <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-soft); border-radius: 15px; padding: 15px;">
+                         <img src="https://i.postimg.cc/HxGJFn1m/Remove-the-fingers-202603231945.jpg" style="width: 100%; border-radius: 10px; margin-bottom: 10px;">
+                         <h4>Mastering 3D Modelling</h4>
+                         <p style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 10px;">Published on: Apr 20, 2026</p>
+                         <div style="display: flex; gap: 10px;">
+                             <button style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border-soft); background: transparent; color: white;">Edit</button>
+                             <button style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ef4444; background: rgba(239, 68, 68, 0.1); color: #ef4444;">Delete</button>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+        </div>
+
+        <!-- SUBSCRIBERS VIEW -->
+        <div id="admin-subscribers" class="content-view">
+            <div class="admin-row">
+                <div class="admin-card">
+                    <div class="card-header">
+                        <h2>Email Subscribers</h2>
+                        <span class="status-badge status-active">1,240 Total</span>
+                    </div>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Source</th>
+                                <th>Date Joined</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>biman@example.com</td>
+                                <td>Main Website</td>
+                                <td>2 mins ago</td>
+                                <td><span class="status-badge status-active">Active</span></td>
+                                <td><i class="fa-solid fa-trash-can action-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td>client@work.com</td>
+                                <td>Client Portal</td>
+                                <td>1 hour ago</td>
+                                <td><span class="status-badge status-active">Active</span></td>
+                                <td><i class="fa-solid fa-trash-can action-icon"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="admin-card">
+                    <div class="card-header">
+                        <h2>Send Newsletter</h2>
+                    </div>
+                    <form onsubmit="alert('Newsletter Broadcast Sent!'); return false;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; font-size: 0.8rem; margin-bottom: 8px; color: var(--text-dim);">Subject</label>
+                            <input type="text" placeholder="Latest 3D Project Updates" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-soft); color: white; padding: 12px; border-radius: 10px;">
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; font-size: 0.8rem; margin-bottom: 8px; color: var(--text-dim);">Message Content</label>
+                            <textarea placeholder="Hi everyone, I just uploaded a new..." style="width: 100%; height: 150px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-soft); color: white; padding: 12px; border-radius: 10px;"></textarea>
+                        </div>
+                        <button type="submit" style="width: 100%; background: var(--accent-purple); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                            <i class="fa-solid fa-paper-plane"></i> BROADCAST EMAIL
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROJECTS VIEW -->
+        <div id="admin-projects" class="content-view">
+            <div class="admin-header" style="margin-bottom: 20px;">
+                <h2>Project Management</h2>
+                <button style="background: var(--accent-purple); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">
+                    <i class="fa-solid fa-plus"></i> New Project
+                </button>
+            </div>
+            <div class="admin-card">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Project Name</th>
+                            <th>Client</th>
+                            <th>Status</th>
+                            <th>Deadline</th>
+                            <th>Progress</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Valorant Montage</td>
+                            <td>Alex Mercer</td>
+                            <td><span class="status-badge status-active">In Progress</span></td>
+                            <td>Apr 30, 2026</td>
+                            <td>
+                                <div style="width: 100%; background: rgba(255,255,255,0.1); border-radius: 10px; height: 8px;">
+                                    <div style="width: 75%; background: var(--accent-purple); height: 8px; border-radius: 10px;"></div>
+                                </div>
+                                <span style="font-size: 0.8rem; color: var(--text-dim);">75%</span>
+                            </td>
+                            <td>
+                                <i class="fa-solid fa-eye action-icon"></i>
+                                <i class="fa-solid fa-pen-to-square action-icon"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Stream Overlay</td>
+                            <td>Kavindu Silva</td>
+                            <td><span class="status-badge status-pending">Review</span></td>
+                            <td>May 5, 2026</td>
+                            <td>
+                                <div style="width: 100%; background: rgba(255,255,255,0.1); border-radius: 10px; height: 8px;">
+                                    <div style="width: 90%; background: var(--accent-purple); height: 8px; border-radius: 10px;"></div>
+                                </div>
+                                <span style="font-size: 0.8rem; color: var(--text-dim);">90%</span>
+                            </td>
+                            <td>
+                                <i class="fa-solid fa-eye action-icon"></i>
+                                <i class="fa-solid fa-pen-to-square action-icon"></i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SERVICES VIEW -->
+        <div id="admin-services" class="content-view">
+            <div class="admin-header" style="margin-bottom: 20px;">
+                <h2>Manage Services</h2>
+                <button style="background: var(--accent-purple); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">
+                    <i class="fa-solid fa-plus"></i> Add Service
+                </button>
+            </div>
+            <div class="admin-card">
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                    <!-- Service Card 1 -->
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-soft); border-radius: 15px; padding: 20px;">
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                            <div style="width: 50px; height: 50px; border-radius: 10px; background: rgba(139, 92, 246, 0.1); color: var(--accent-purple); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                <i class="fa-solid fa-video"></i>
+                            </div>
+                            <div>
+                                <h4>Video Editing</h4>
+                                <p style="font-size: 0.8rem; color: var(--text-dim);">Starting at $50</p>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 15px;">Professional video editing for YouTube, TikTok, and Montages.</p>
+                        <div style="display: flex; gap: 10px;">
+                            <button style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border-soft); background: transparent; color: white;">Edit</button>
+                            <button style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ef4444; background: rgba(239, 68, 68, 0.1); color: #ef4444;">Delete</button>
+                        </div>
+                    </div>
+                    <!-- Service Card 2 -->
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-soft); border-radius: 15px; padding: 20px;">
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                            <div style="width: 50px; height: 50px; border-radius: 10px; background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                <i class="fa-solid fa-palette"></i>
+                            </div>
+                            <div>
+                                <h4>Graphic Design</h4>
+                                <p style="font-size: 0.8rem; color: var(--text-dim);">Starting at $20</p>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 15px;">High-quality custom graphics, posters, and social media kits.</p>
+                        <div style="display: flex; gap: 10px;">
+                            <button style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border-soft); background: transparent; color: white;">Edit</button>
+                            <button style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ef4444; background: rgba(239, 68, 68, 0.1); color: #ef4444;">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TESTIMONIALS VIEW -->
+        <div id="admin-testimonials" class="content-view">
+            <div class="admin-header" style="margin-bottom: 20px;">
+                <h2>Manage Testimonials</h2>
+                <button style="background: var(--accent-purple); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">
+                    <i class="fa-solid fa-plus"></i> Add Testimonial
+                </button>
+            </div>
+            <div class="admin-card">
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 20px;">
+                    <!-- Testimonial Card 1 -->
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-soft); border-radius: 15px; padding: 20px;">
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                            <img src="https://i.postimg.cc/T3Qdxw8c/image.png" style="width: 50px; height: 50px; border-radius: 50%;">
+                            <div>
+                                <h4>Alex Mercer</h4>
+                                <p style="font-size: 0.8rem; color: var(--text-dim);">Content Creator</p>
+                                <div style="color: #f59e0b; font-size: 0.9rem;">
+                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 15px;">"Biman's editing skills are next level! He perfectly captured the Valorant vibe I wanted for my montage. Highly recommended!"</p>
+                        <div style="display: flex; gap: 10px;">
+                            <button style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border-soft); background: transparent; color: white;">Edit</button>
+                            <button style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ef4444; background: rgba(239, 68, 68, 0.1); color: #ef4444;">Delete</button>
+                        </div>
+                    </div>
+                    <!-- Testimonial Card 2 -->
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-soft); border-radius: 15px; padding: 20px;">
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                            <img src="https://i.postimg.cc/vBSB7m8k/Remove-the-fingers-202603231945-(2).png" style="width: 50px; height: 50px; border-radius: 50%;">
+                            <div>
+                                <h4>Sarah Jenkins</h4>
+                                <p style="font-size: 0.8rem; color: var(--text-dim);">YouTuber</p>
+                                <div style="color: #f59e0b; font-size: 0.9rem;">
+                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 15px;">"The thumbnails he designed boosted my click-through rate instantly. Super fast delivery and great communication."</p>
+                        <div style="display: flex; gap: 10px;">
+                            <button style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border-soft); background: transparent; color: white;">Edit</button>
+                            <button style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ef4444; background: rgba(239, 68, 68, 0.1); color: #ef4444;">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SETTINGS VIEW -->
+        <div id="admin-settings" class="content-view">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h2>Site Settings</h2>
+                </div>
+                <form style="display: grid; gap: 20px;">
+                    <div>
+                        <label style="display: block; font-size: 0.9rem; margin-bottom: 8px; color: var(--text-dim);">Site Title</label>
+                        <input type="text" value="Biman Ranasinghe - Portfolio" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-soft); color: white; padding: 12px; border-radius: 10px;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.9rem; margin-bottom: 8px; color: var(--text-dim);">Email Address</label>
+                        <input type="email" value="bimanranasinghe@email.com" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-soft); color: white; padding: 12px; border-radius: 10px;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.9rem; margin-bottom: 8px; color: var(--text-dim);">Maintenance Mode</label>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" style="width: 20px; height: 20px;">
+                            <span>Enable maintenance mode</span>
+                        </label>
+                    </div>
+                    <button type="submit" style="background: var(--accent-purple); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                        <i class="fa-solid fa-save"></i> Save Settings
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Tab Navigation Logic
+        function showAdminView(viewId, el) {
+            document.querySelectorAll('.admin-nav-item').forEach(item => item.classList.remove('active'));
+            el.classList.add('active');
+
+            document.querySelectorAll('.content-view').forEach(view => view.classList.remove('active'));
+            document.getElementById('admin-' + viewId).classList.add('active');
+
+            const titles = {
+                'overview': { t: 'Dashboard Overview', d: "Monitor your site's performance and manage your professional business." },
+                'analytics': { t: 'Real-time Analytics', d: 'Deep dive into traffic sources and user behavior metrics.' },
+                'users': { t: 'User Management', d: 'Manage client accounts, permissions, and security settings.' },
+                'projects': { t: 'Project Flow', d: 'Track project milestones and manage client deliverables.' },
+                'services': { t: 'Services Management', d: 'Create, edit, and manage your service offerings and pricing.' },
+                'testimonials': { t: 'Testimonials', d: 'Manage client reviews and feedback for your portfolio.' },
+                'blog': { t: 'Blog Management', d: 'Create, edit, and publish articles to your portfolio blog.' },
+                'subscribers': { t: 'Email Subscriptions', d: 'Manage your audience and send newsletters/updates.' },
+                'settings': { t: 'System Settings', d: 'Configure global site parameters and API integrations.' }
+            };
+
+            document.getElementById('admin-view-title').textContent = titles[viewId].t;
+            document.getElementById('admin-view-desc').textContent = titles[viewId].d;
+        }
+
+        // Initialize Charts
+        window.onload = function() {
+            const trafficCtx = document.getElementById('trafficChart').getContext('2d');
+            new Chart(trafficCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Visits',
+                        data: [1200, 1900, 1500, 2500, 2200, 3000, 2800],
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+
+            const servicesCtx = document.getElementById('servicesChart').getContext('2d');
+            new Chart(servicesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Video Editing', '3D Design', 'Web Dev', 'Graphic'],
+                    datasets: [{
+                        data: [45, 25, 20, 10],
+                        backgroundColor: ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 20 } }
+                    }
+                }
+            });
+
+            // Add event listeners for buttons
+            document.querySelectorAll('button').forEach(btn => {
+                if (btn.textContent.includes('Add') || btn.textContent.includes('New')) {
+                    btn.addEventListener('click', () => alert('Feature coming soon! This would open a modal to add new content.'));
+                }
+                if (btn.textContent.includes('Edit')) {
+                    btn.addEventListener('click', () => alert('Edit functionality would open a form to modify this item.'));
+                }
+                if (btn.textContent.includes('Delete')) {
+                    btn.addEventListener('click', () => {
+                        if (confirm('Are you sure you want to delete this item?')) {
+                            alert('Item deleted successfully!');
+                        }
+                    });
+                }
+                if (btn.textContent.includes('Save Settings')) {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        alert('Settings saved successfully!');
+                    });
+                }
+                if (btn.textContent.includes('BROADCAST EMAIL')) {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        alert('Newsletter sent to all subscribers!');
+                    });
+                }
+            });
+        };
+
+        // ================= VANILLATILT 3D TILT EFFECT =================
+        function initTiltCards() {
+            if (typeof VanillaTilt !== 'undefined') {
+                // Tilt for stat cards
+                VanillaTilt.init(document.querySelectorAll('.stat-card'), {
+                    max: 12,
+                    speed: 400,
+                    glare: true,
+                    "max-glare": 0.25,
+                    scale: 1.02,
+                    perspective: 1000
+                });
+
+                // Tilt for admin cards
+                VanillaTilt.init(document.querySelectorAll('.admin-card'), {
+                    max: 8,
+                    speed: 300,
+                    glare: true,
+                    "max-glare": 0.15,
+                    scale: 1.01
+                });
+
+                // Tilt for service cards
+                VanillaTilt.init(document.querySelectorAll('[style*="background: rgba(255,255,255,0.03)"]'), {
+                    max: 10,
+                    speed: 350,
+                    glare: true,
+                    "max-glare": 0.2,
+                    scale: 1.02
+                });
+            }
+        }
+
+        // Initialize tilt cards on page load
+        window.onload = function() {
+            initTiltCards();
+        };
+    </script>
+</body>
+</html>

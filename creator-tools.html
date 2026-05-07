@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creator Tools | Biman Ranasinghe</title>
+    <meta name="description" content="AI-powered creator tools including image generation, video creation, and social media extraction.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --bg-card: rgba(20, 20, 25, 0.7);
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --accent-red: #ed215e;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --text-secondary: #94a3b8;
+            --font-head: 'Bebas Neue', sans-serif;
+            --border-soft: rgba(255, 255, 255, 0.05);
+            --radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        /* Space Background */
+        .space-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 10% 10%, #1e1b4b 0%, #050505 50%); z-index: -1; }
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.3; z-index: -1; }
+
+        /* Header */
+        .tools-header {
+            padding: 30px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+            color: var(--accent-purple);
+        }
+
+        .logo span {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            color: var(--accent-purple);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-purple);
+            color: white;
+        }
+
+        /* Main Container */
+        .tools-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 50px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .page-title h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-title p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+
+        /* Tool Tabs */
+        .tools-tab-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .tool-tab-btn {
+            padding: 15px 35px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-soft);
+            border-radius: 14px;
+            color: var(--text-dim);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tool-tab-btn:hover {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--accent-purple);
+        }
+
+        .tool-tab-btn.active {
+            background: var(--accent-purple);
+            color: white;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+
+        /* Tool Views */
+        .tool-view {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tool-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Nova AI Container */
+        .nova-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-soft);
+            border-radius: 24px;
+            padding: 40px;
+        }
+
+        .nova-left h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .nova-left p {
+            color: var(--text-dim);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .nova-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-soft);
+            border-radius: 14px;
+            padding: 20px;
+            color: white;
+            font-size: 1rem;
+            resize: none;
+            min-height: 150px;
+            margin-bottom: 20px;
+        }
+
+        .nova-input:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+        }
+
+        .nova-input::placeholder {
+            color: var(--text-dim);
+        }
+
+        .btn-generate {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-generate:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Result Area */
+        .nova-right {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            border: 2px dashed rgba(139, 92, 246, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nova-placeholder {
+            text-align: center;
+            color: var(--text-dim);
+        }
+
+        .nova-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .nova-result {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .loader {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .loader::before {
+            content: '';
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border-soft);
+            border-top-color: var(--accent-purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Social Extractor */
+        .extractor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-soft);
+            border-radius: 24px;
+            padding: 40px;
+        }
+
+        .extractor-result {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            border: 2px dashed rgba(27, 138, 219, 0.3);
+            text-align: center;
+            padding: 30px;
+        }
+
+        .extractor-result i {
+            font-size: 4rem;
+            color: var(--accent-blue);
+            margin-bottom: 20px;
+        }
+
+        .extractor-result p {
+            color: var(--text-dim);
+        }
+
+        /* Motion AI */
+        .motion-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-soft);
+            border-radius: 24px;
+            padding: 40px;
+        }
+
+        .motion-video-container {
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        .motion-video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .nova-container,
+            .extractor-container,
+            .motion-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .tools-header {
+                padding: 20px;
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .tools-container {
+                padding: 20px;
+            }
+            
+            .page-title h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="space-bg"></div>
+    <div class="stars"></div>
+
+    <!-- Header -->
+    <header class="tools-header">
+        <a href="index.html" class="logo">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>CREATOR TOOLS</span>
+        </a>
+        <div style="display: flex; gap: 15px;">
+
+            <a href="index.html" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="tools-container">
+        <div class="page-title">
+            <h1>CREATOR TOOLS</h1>
+            <p>AI-powered tools to enhance your creative workflow</p>
+        </div>
+
+        <!-- Tool Tabs -->
+        <div class="tools-tab-container">
+            <button class="tool-tab-btn active" onclick="switchTool('nova')">
+                <i class="fa-solid fa-image"></i> NOVA BANANA AI
+            </button>
+            <button class="tool-tab-btn" onclick="switchTool('motion')">
+                <i class="fa-solid fa-film"></i> NOVA MOTION AI
+            </button>
+            <button class="tool-tab-btn" onclick="switchTool('extractor')">
+                <i class="fa-solid fa-download"></i> SOCIAL EXTRACTOR
+            </button>
+        </div>
+
+        <!-- Nova Banana AI -->
+        <div id="tool-nova" class="tool-view active">
+            <div class="nova-container">
+                <div class="nova-left">
+                    <h3><i class="fa-solid fa-wand-magic-sparkles"></i> AI Image Generator</h3>
+                    <p>Create amazing images with Nova Banana AI. Describe what you want to see and our AI engine will generate it in seconds.</p>
+                    <a href="nova-ai.html" style="display: inline-block; margin-bottom: 20px; color: var(--accent-purple); font-weight: 800; text-decoration: none; font-size: 0.8rem;">
+                        <i class="fa-solid fa-star"></i> TRY PREMIUM NOVA AI (MIDJOURNEY STYLE)
+                    </a>
+                    <textarea id="nova-prompt" class="nova-input" placeholder="A futuristic cyberpunk city with neon lights and flying cars..."></textarea>
+                    <button id="nova-generate" class="btn-generate" onclick="generateImage()">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> GENERATE IMAGE
+                    </button>
+                </div>
+                <div class="nova-right">
+                    <div id="nova-placeholder" class="nova-placeholder">
+                        <i class="fa-solid fa-image"></i>
+                        <p>Generated Image will appear here</p>
+                    </div>
+                    <div id="nova-loader" class="loader"></div>
+                    <img id="nova-result-img" class="nova-result" alt="AI Generated Image">
+                </div>
+            </div>
+        </div>
+
+        <!-- Nova Motion AI -->
+        <div id="tool-motion" class="tool-view">
+            <div class="motion-container">
+                <div class="nova-left">
+                    <h3><i class="fa-solid fa-clapperboard"></i> AI Video Generator</h3>
+                    <p>Turn your text into cinematic motion. Nova Motion AI generates high-fidelity video clips for your projects.</p>
+                    <textarea id="motion-prompt" class="nova-input" placeholder="A dramatic dragon flying over a volcanic landscape..."></textarea>
+                    <button id="motion-generate" class="btn-generate" onclick="generateVideo()" style="background: linear-gradient(90deg, #ed215e, #8f1221);">
+                        <i class="fa-solid fa-clapperboard"></i> GENERATE VIDEO
+                    </button>
+                </div>
+                <div class="nova-right">
+                    <div id="motion-placeholder" class="nova-placeholder">
+                        <i class="fa-solid fa-film"></i>
+                        <p>Generated Video will appear here</p>
+                    </div>
+                    <div id="motion-loader" class="loader"></div>
+                    <div id="motion-video-container" class="motion-video-container">
+                        <video id="motion-result-video" loop muted playsinline></video>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Extractor -->
+        <div id="tool-extractor" class="tool-view">
+            <div class="extractor-container">
+                <div class="nova-left">
+                    <h3><i class="fa-solid fa-download"></i> Social Media Extractor</h3>
+                    <p>Paste your video link below to extract and download media from TikTok, YouTube, Instagram, and Facebook.</p>
+                    <textarea id="extract-prompt" class="nova-input" placeholder="https://www.tiktok.com/@... / https://youtu.be/..." style="height: 100px;"></textarea>
+                    <button id="extract-generate" class="btn-generate" onclick="extractMedia()" style="background: linear-gradient(90deg, #1b8adb, #11578e);">
+                        <i class="fa-solid fa-cloud-arrow-down"></i> PROCESS MEDIA
+                    </button>
+                </div>
+                <div class="extractor-result">
+                    <i class="fa-solid fa-photo-film"></i>
+                    <p>Media processor result will appear here</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Tool Tab Switching
+        function switchTool(toolId) {
+            // Update buttons
+            document.querySelectorAll('.tool-tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.tool-tab-btn').classList.add('active');
+
+            // Update views
+            document.querySelectorAll('.tool-view').forEach(view => view.classList.remove('active'));
+            document.getElementById('tool-' + toolId).classList.add('active');
+        }
+
+        // Nova Banana AI Image Generator
+        const novaInput = document.getElementById('nova-prompt');
+        const novaBtn = document.getElementById('nova-generate');
+        const novaResult = document.getElementById('nova-result-img');
+        const novaPlaceholder = document.getElementById('nova-placeholder');
+        const novaLoader = document.getElementById('nova-loader');
+
+        function generateImage() {
+            const promptInfo = novaInput.value.trim();
+            if (!promptInfo) {
+                alert('Please enter a prompt first!');
+                return;
+            }
+
+            novaBtn.disabled = true;
+            novaBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GENERATING...';
+            novaPlaceholder.style.display = 'none';
+            novaResult.style.display = 'none';
+            novaLoader.style.display = 'block';
+
+            const renderUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptInfo)}?width=1024&height=1024&nologo=true`;
+
+            const tmpImg = new Image();
+            tmpImg.src = renderUrl;
+
+            tmpImg.onload = () => {
+                novaResult.src = renderUrl;
+                novaLoader.style.display = 'none';
+                novaResult.style.display = 'block';
+                novaBtn.disabled = false;
+                novaBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> GENERATE IMAGE';
+            };
+
+            tmpImg.onerror = () => {
+                alert('Failed to generate image. Please try again.');
+                novaLoader.style.display = 'none';
+                novaPlaceholder.style.display = 'flex';
+                novaBtn.disabled = false;
+                novaBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> GENERATE IMAGE';
+            };
+        }
+
+        // Nova Motion AI Video Generator
+        const motionBtn = document.getElementById('motion-generate');
+        const motionInput = document.getElementById('motion-prompt');
+        const motionVideo = document.getElementById('motion-result-video');
+        const motionPlaceholder = document.getElementById('motion-placeholder');
+        const motionLoader = document.getElementById('motion-loader');
+        const motionContainer = document.getElementById('motion-video-container');
+
+        const demoVideos = [
+            "https://cdn.pixabay.com/vimeo/451368297/451368297.mp4?width=1280&hash=123",
+            "https://cdn.pixabay.com/vimeo/328940142/328940142.mp4?width=1280&hash=123",
+            "https://cdn.pixabay.com/vimeo/464303350/464303350.mp4?width=1280&hash=123"
+        ];
+
+        function generateVideo() {
+            const prompt = motionInput.value.trim();
+            if (!prompt) {
+                alert('Please enter a prompt first!');
+                return;
+            }
+
+            motionBtn.disabled = true;
+            motionBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GENERATING VIDEO...';
+            motionPlaceholder.style.display = 'none';
+            motionContainer.style.display = 'none';
+            motionLoader.style.display = 'block';
+
+            setTimeout(() => {
+                const randomVideo = demoVideos[Math.floor(Math.random() * demoVideos.length)];
+                motionVideo.src = randomVideo;
+                motionVideo.load();
+                motionVideo.oncanplay = () => {
+                    motionLoader.style.display = 'none';
+                    motionContainer.style.display = 'block';
+                    motionVideo.play();
+                    motionBtn.disabled = false;
+                    motionBtn.innerHTML = '<i class="fa-solid fa-clapperboard"></i> GENERATE VIDEO';
+                };
+            }, 3500);
+        }
+
+        // Social Media Extractor
+        const extractBtn = document.getElementById('extract-generate');
+        const extractInput = document.getElementById('extract-prompt');
+        const extractResult = document.querySelector('.extractor-result');
+
+        function extractMedia() {
+            const url = extractInput.value.trim();
+            if (!url) {
+                alert('Please enter a valid video URL first!');
+                return;
+            }
+
+            const originalBtnHtml = extractBtn.innerHTML;
+            extractBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> EXTRACTING...';
+            extractBtn.disabled = true;
+
+            extractResult.innerHTML = `
+                <i class="fa-solid fa-spinner fa-spin" style="font-size: 3.5rem; color: var(--accent-blue); margin-bottom: 20px;"></i>
+                <p style="font-family: var(--font-head); font-size: 1.5rem; letter-spacing: 2px; color: #fff; margin:0;">ANALYZING SERVER...</p>
+                <p style="color: var(--text-secondary); font-size: 0.85rem;">Please wait a moment while we fetch the media.</p>
+            `;
+
+            setTimeout(() => {
+                let platformIcon = 'video';
+                let platformName = 'Video';
+                let dlLink = '#';
+
+                const lowerUrl = url.toLowerCase();
+
+                if (lowerUrl.includes('tiktok.com')) {
+                    platformIcon = 'tiktok'; platformName = 'TikTok';
+                    dlLink = `https://snaptik.app/?url=${encodeURIComponent(url)}`;
+                } else if (lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be')) {
+                    platformIcon = 'youtube'; platformName = 'YouTube';
+                    dlLink = `https://en.savefrom.net/1-youtube-video-downloader-362/?url=${encodeURIComponent(url)}`;
+                } else if (lowerUrl.includes('instagram.com')) {
+                    platformIcon = 'instagram'; platformName = 'Instagram';
+                    dlLink = `https://snapinsta.app/?url=${encodeURIComponent(url)}`;
+                } else if (lowerUrl.includes('facebook.com') || lowerUrl.includes('fb.watch') || lowerUrl.includes('fb.com')) {
+                    platformIcon = 'facebook'; platformName = 'Facebook';
+                    dlLink = `https://fdown.net/download.php?url=${encodeURIComponent(url)}`;
+                } else {
+                    extractResult.innerHTML = `
+                        <i class="fa-solid fa-circle-exclamation" style="font-size: 3.5rem; color: #ed215e; margin-bottom: 20px;"></i>
+                        <p style="font-family: var(--font-head); font-size: 1.5rem; letter-spacing: 2px; color: #ed215e; margin:0;">UNSUPPORTED PLATFORM</p>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; padding: 0 20px; text-align: center;">Please try standard paths for YouTube, TikTok, Facebook, or Instagram.</p>
+                    `;
+                    extractBtn.innerHTML = originalBtnHtml;
+                    extractBtn.disabled = false;
+                    return;
+                }
+
+                extractResult.innerHTML = `
+                    <div style="text-align: center; display:flex; flex-direction:column; align-items:center; justify-content: center; height: 100%; gap: 15px;">
+                        <i class="fa-brands fa-${platformIcon}" style="font-size: 4rem; color: var(--accent-blue); filter: drop-shadow(0 0 20px rgba(27,138,219,0.5));"></i>
+                        <h3 style="color: #fff; font-family: var(--font-head); letter-spacing: 3px; font-size: 2.2rem; margin:0;">${platformName} FILE READY</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; padding: 0 40px; margin:0;">The media stream has been processed successfully! Click below to safely download your media offline.</p>
+                        <a href="${dlLink}" target="_blank" class="btn-generate" style="text-decoration: none; margin-top: 15px; width: auto; font-size:1rem; padding: 15px 35px; background: #fff; color: #000; box-shadow: 0 10px 20px rgba(255,255,255,0.2);">
+                            <i class="fa-solid fa-cloud-arrow-down" style="color: #000;"></i> DOWNLOAD NOW
+                        </a>
+                    </div>
+                `;
+
+                extractBtn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> PROCESS NEW LINK';
+                extractBtn.disabled = false;
+                extractInput.value = '';
+            }, 1800);
+        }
+    </script>
+    <script src="page-transition.js"></script>
+</body>
+</html>

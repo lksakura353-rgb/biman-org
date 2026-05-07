@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Service | Biman Ranasinghe</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/jjY6ghZT/image.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;600;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        .booking-container {
+            max-width: 1200px;
+            margin: 120px auto;
+            padding: 0 20px;
+        }
+
+        .booking-steps {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 0.9rem;
+            opacity: 0.5;
+            transition: all 0.3s;
+        }
+
+        .step.active {
+            opacity: 1;
+            color: var(--accent-blue);
+        }
+
+        .step-num {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid currentColor;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Forms Section */
+        .booking-card {
+            padding: 50px;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .booking-view {
+            display: none;
+            animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .booking-view.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Service Selection */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .service-opt {
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .service-opt i {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+        }
+
+        .service-opt h3 {
+            font-family: var(--font-head);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .service-opt .price {
+            font-weight: 800;
+            color: #fff;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .service-opt:hover, .service-opt.selected {
+            background: rgba(27, 138, 219, 0.1);
+            border-color: var(--accent-blue);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(27, 138, 219, 0.2);
+        }
+
+        /* Details Form */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: var(--accent-blue);
+            background: rgba(27, 138, 219, 0.05);
+        }
+
+        /* Payment Summary */
+        .summary-box {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+        }
+
+        .summary-row.total {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 800;
+            color: #fff;
+            font-size: 1.5rem;
+        }
+
+        /* Payment Form */
+        .payment-methods {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .pay-method {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pay-method.active {
+            border-color: var(--accent-blue);
+            background: rgba(27, 138, 219, 0.1);
+        }
+
+        /* Buttons */
+        .booking-btns {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+
+        .btn-back {
+            background: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 15px 35px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .btn-next {
+            background: var(--accent-blue);
+            border: none;
+            color: #fff;
+            padding: 15px 50px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 800;
+            box-shadow: 0 10px 20px rgba(27, 138, 219, 0.3);
+        }
+
+        /* Success View */
+        .success-content {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            margin: 0 auto 30px;
+            animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 900px) {
+            .service-grid { grid-template-columns: 1fr; }
+            .booking-card { padding: 30px 20px; }
+            .booking-steps { gap: 20px; flex-wrap: wrap; }
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+    <!-- Video Background -->
+    <div class="video-background">
+        <div class="video-foreground">
+            <iframe id="streamable-player"
+                src="https://streamable.com/e/xapxv4?autoplay=1&muted=1&controls=0&nocontrol=1&loop=1" frameborder="0"
+                allow="autoplay; fullscreen">
+            </iframe>
+        </div>
+        <div class="overlay"></div>
+    </div>
+
+    <!-- Global Liquid Glass Background -->
+    <div class="liquid-glass-bg">
+        <div class="glass-blobs">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+            <div class="blob blob-4"></div>
+        </div>
+        <div class="glass-noise"></div>
+    </div>
+
+    <a href="index.html" class="back-home-btn" style="position: fixed; top: 30px; left: 30px; z-index: 1000; padding: 12px 25px; border-radius: 30px; background: rgba(10, 15, 25, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); color: #fff; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-arrow-left"></i> BACK TO HOME
+    </a>
+
+    <main class="booking-container">
+        <div class="booking-steps" data-aos="fade-down">
+            <div class="step active" id="step1-indicator">
+                <div class="step-num">1</div> SERVICE
+            </div>
+            <div class="step" id="step2-indicator">
+                <div class="step-num">2</div> DETAILS
+            </div>
+            <div class="step" id="step3-indicator">
+                <div class="step-num">3</div> PAYMENT
+            </div>
+        </div>
+
+        <div class="booking-card liquid-glass" data-aos="fade-up">
+            <!-- Step 1: Service Selection -->
+            <div id="view-step1" class="booking-view active">
+                <h2 style="font-family: var(--font-head); font-size: 2.5rem; color: #fff; margin-bottom: 30px;">CHOOSE A SERVICE</h2>
+                <div class="service-grid">
+                    <div class="service-opt" onclick="selectService(this, 'Short Form Video', 45)">
+                        <i class="fa-solid fa-bolt"></i>
+                        <h3>REELS / TIKTOK</h3>
+                        <p class="price">$45.00</p>
+                        <p style="color: var(--text-secondary); font-size: 0.8rem;">Professional vertical editing with captions & sound design.</p>
+                    </div>
+                    <div class="service-opt" onclick="selectService(this, 'Long Form Video', 150)">
+                        <i class="fa-solid fa-clapperboard"></i>
+                        <h3>YOUTUBE EDIT</h3>
+                        <p class="price">$150.00</p>
+                        <p style="color: var(--text-secondary); font-size: 0.8rem;">Full cinematic editing for long-form content (up to 15min).</p>
+                    </div>
+                    <div class="service-opt" onclick="selectService(this, 'Graphic Design', 75)">
+                        <i class="fa-solid fa-palette"></i>
+                        <h3>BRAND DESIGN</h3>
+                        <p class="price">$75.00</p>
+                        <p style="color: var(--text-secondary); font-size: 0.8rem;">Logos, banners, and social media assets for your brand.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Project Details -->
+            <div id="view-step2" class="booking-view">
+                <h2 style="font-family: var(--font-head); font-size: 2.5rem; color: #fff; margin-bottom: 30px;">PROJECT DETAILS</h2>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="cust-name" placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Project Brief</label>
+                    <textarea id="cust-brief" rows="4" placeholder="Describe your project requirements..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Link to Footage (Drive/Mega)</label>
+                    <input type="url" id="cust-link" placeholder="https://drive.google.com/...">
+                </div>
+            </div>
+
+            <!-- Step 3: Payment -->
+            <div id="view-step3" class="booking-view">
+                <h2 style="font-family: var(--font-head); font-size: 2.5rem; color: #fff; margin-bottom: 30px;">ORDER SUMMARY</h2>
+                <div class="summary-box">
+                    <div class="summary-row">
+                        <span>Selected Service:</span>
+                        <span id="summary-service">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Base Price:</span>
+                        <span id="summary-price">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Processing Fee:</span>
+                        <span>$2.50</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total Amount:</span>
+                        <span id="summary-total">$0.00</span>
+                    </div>
+                </div>
+
+                <div class="payment-methods">
+                    <div class="pay-method active"><i class="fa-brands fa-cc-visa"></i> CARD</div>
+                    <div class="pay-method"><i class="fa-brands fa-paypal"></i> PAYPAL</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Card Details (Mock)</label>
+                    <input type="text" placeholder="XXXX XXXX XXXX XXXX">
+                </div>
+            </div>
+
+            <!-- Success View -->
+            <div id="view-success" class="booking-view">
+                <div class="success-content">
+                    <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+                    <h2 style="font-family: var(--font-head); font-size: 3rem; color: #fff; margin-bottom: 10px;">BOOKING SUCCESSFUL!</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 30px;">Your order ID is <b>#BIM-98231</b>. Biman will contact you shortly.</p>
+                    <button class="btn-next" onclick="window.location.href='index.html'">GO HOME</button>
+                </div>
+            </div>
+
+            <div class="booking-btns" id="action-btns">
+                <button class="btn-back" id="btn-prev" onclick="changeStep(-1)" style="visibility: hidden;">BACK</button>
+                <button class="btn-next" id="btn-next" onclick="changeStep(1)">CONTINUE</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 1000, once: true });
+
+        let currentStep = 1;
+        let selectedServiceName = '';
+        let selectedServicePrice = 0;
+
+        function selectService(el, name, price) {
+            document.querySelectorAll('.service-opt').forEach(opt => opt.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedServiceName = name;
+            selectedServicePrice = price;
+        }
+
+        function changeStep(dir) {
+            if (dir === 1 && currentStep === 1 && !selectedServiceName) {
+                alert('මචං, මුලින්ම සේවාවක් තෝරන්න!');
+                return;
+            }
+
+            if (dir === 1 && currentStep === 3) {
+                completeBooking();
+                return;
+            }
+
+            currentStep += dir;
+            updateUI();
+        }
+
+        function updateUI() {
+            // Update indicators
+            document.querySelectorAll('.step').forEach((s, idx) => {
+                s.classList.toggle('active', idx + 1 === currentStep);
+            });
+
+            // Update views
+            document.querySelectorAll('.booking-view').forEach((v, idx) => {
+                v.classList.toggle('active', idx + 1 === currentStep);
+            });
+
+            // Update buttons
+            document.getElementById('btn-prev').style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+            document.getElementById('btn-next').innerText = currentStep === 3 ? 'PAY NOW' : 'CONTINUE';
+
+            // Update summary
+            if (currentStep === 3) {
+                document.getElementById('summary-service').innerText = selectedServiceName;
+                document.getElementById('summary-price').innerText = `$${selectedServicePrice.toFixed(2)}`;
+                document.getElementById('summary-total').innerText = `$${(selectedServicePrice + 2.5).toFixed(2)}`;
+            }
+        }
+
+        function completeBooking() {
+            document.getElementById('view-step3').classList.remove('active');
+            document.getElementById('view-success').classList.add('active');
+            document.getElementById('action-btns').style.display = 'none';
+            document.getElementById('step3-indicator').classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

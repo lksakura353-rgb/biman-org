@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog | Biman Ranasinghe - Tips, Tutorials & Stories</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Read the latest articles on video editing, design tips, and content creation from Biman Ranasinghe.">
+    <meta name="keywords" content="blog, video editing, design, tutorials, content creation, BIMAN">
+    <meta name="author" content="Biman Ranasinghe">
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/jjY6ghZT/image.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        .blog-hero {
+            padding: 130px 20px 60px;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(180deg, rgba(27, 138, 219, 0.1) 0%, transparent 100%);
+        }
+
+        .blog-hero h1 {
+            font-family: var(--font-head);
+            font-size: 5rem;
+            letter-spacing: 5px;
+            color: #fff;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(27, 138, 219, 0.3);
+        }
+
+        .blog-hero h1 span {
+            color: var(--accent-blue);
+        }
+
+        .blog-hero p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Blog Filter Categories */
+        .blog-filters {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 0 20px 50px;
+        }
+
+        .filter-btn {
+            padding: 10px 24px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: #fff;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: #fff;
+        }
+
+        /* Blog Grid */
+        .blog-section {
+            padding: 0 20px 80px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .blog-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .blog-card-img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        .blog-card-body {
+            padding: 24px;
+        }
+
+        .blog-card-category {
+            display: inline-block;
+            padding: 5px 14px;
+            background: rgba(27, 138, 219, 0.15);
+            color: var(--accent-blue);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .blog-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .blog-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .blog-card-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .blog-card-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Loading State */
+        .loading {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .blog-hero h1 {
+                font-size: 3rem;
+            }
+
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Include Navigation -->
+    <div id="nav-placeholder"></div>
+
+    <!-- Hero -->
+    <section class="blog-hero">
+        <h1>MY <span>BLOG</span></h1>
+        <p>Tips, tutorials & stories from my content creation journey</p>
+    </section>
+
+    <!-- Categories -->
+    <div class="blog-filters">
+        <button class="filter-btn active" onclick="filterCategory('all')">All Posts</button>
+        <button class="filter-btn" onclick="filterCategory('Tutorials')">Tutorials</button>
+        <button class="filter-btn" onclick="filterCategory('Design')">Design</button>
+        <button class="filter-btn" onclick="filterCategory('Tips')">Tips</button>
+        <button class="filter-btn" onclick="filterCategory('Story')">Stories</button>
+    </div>
+
+    <!-- Blog Grid -->
+    <section class="blog-section">
+        <div class="blog-grid" id="blog-grid">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading articles...</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let allPosts = [];
+
+        // Load posts
+        document.addEventListener('DOMContentLoaded', loadPosts);
+
+        async function loadPosts() {
+            try {
+                const response = await fetch('nova_backend/blog.php?action=get_posts&limit=20');
+                const result = await response.json();
+
+                if (result.success) {
+                    allPosts = result.posts;
+                    renderPosts(allPosts);
+                } else {
+                    document.getElementById('blog-grid').innerHTML = '<div class="loading"><p>No posts found</p></div>';
+                }
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                document.getElementById('blog-grid').innerHTML = '<div class="loading"><p>Error loading posts</p></div>';
+            }
+        }
+
+        function renderPosts(posts) {
+            const grid = document.getElementById('blog-grid');
+
+            if (posts.length === 0) {
+                grid.innerHTML = '<div class="loading"><p>No posts in this category</p></div>';
+                return;
+            }
+
+            grid.innerHTML = posts.map(post => `
+                <article class="blog-card" onclick="openBlogPost('${post.slug}')">
+                    <img src="${post.image_url}" alt="${post.title}" class="blog-card-img" loading="lazy">
+                    <div class="blog-card-body">
+                        <span class="blog-card-category">${post.category}</span>
+                        <h3>${post.title}</h3>
+                        <p>${post.excerpt}</p>
+                        <div class="blog-card-meta">
+                            <span><i class="fa-regular fa-clock"></i> ${post.reading_time} min</span>
+                            <span><i class="fa-regular fa-calendar"></i> ${new Date(post.created_at).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function filterCategory(category) {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((category === 'all' && btn.textContent.includes('All')) ||
+                    btn.textContent.includes(category)) {
+                    btn.classList.add('active');
+                }
+            });
+
+            if (category === 'all') {
+                renderPosts(allPosts);
+            } else {
+                const filtered = allPosts.filter(p => p.category === category);
+                renderPosts(filtered);
+            }
+        }
+
+        function openBlogPost(slug) {
+            window.location.href = `blog-post.html?slug=${slug}`;
+        }
+    </script>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

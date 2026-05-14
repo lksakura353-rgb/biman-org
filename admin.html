@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Admin | Content Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ccff00;
+            --bg: #0a0a0c;
+            --card-bg: rgba(20, 20, 25, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: rgba(15, 15, 20, 0.95);
+            border-right: 1px solid var(--border);
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+        }
+
+        .sidebar h2 {
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--primary);
+            margin-bottom: 40px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #888;
+            font-weight: 600;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(204, 255, 0, 0.1);
+            color: #fff;
+        }
+
+        .nav-item i {
+            width: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 60px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .btn-add {
+            background: var(--primary);
+            color: #000;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-add:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(204, 255, 0, 0.4);
+        }
+
+        /* Grid */
+        .cms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .cms-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .cms-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .cms-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .cms-card p {
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-edit, .btn-delete {
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-edit { background: rgba(255, 255, 255, 0.1); color: #fff; }
+        .btn-delete { background: rgba(255, 50, 50, 0.2); color: #ff5050; }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #15151a;
+            width: 500px;
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: #fff;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-save {
+            flex: 1;
+            background: var(--primary);
+            color: #000;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            color: #888;
+            padding: 12px 25px;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Login Screen */
+        #login-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            background: var(--card-bg);
+            padding: 50px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            text-align: center;
+            width: 400px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: #fff;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-box">
+            <h2 style="color: var(--primary); margin-bottom: 30px;">NOVA ADMIN</h2>
+            <input type="password" id="admin-pass" placeholder="Enter Admin Password">
+            <button class="btn-add" style="width: 100%;" onclick="checkLogin()">LOGIN</button>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <h2>NOVA CMS</h2>
+        <div class="nav-item active" onclick="switchTab('packages')">
+            <i class="fa-solid fa-box"></i> Packages
+        </div>
+        <div class="nav-item" onclick="switchTab('blog')">
+            <i class="fa-solid fa-pen-nib"></i> Blog Posts
+        </div>
+        <div class="nav-item" onclick="switchTab('projects')">
+            <i class="fa-solid fa-folder-open"></i> Projects
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1 id="tab-title">Manage Packages</h1>
+            <button class="btn-add" onclick="openModal()">+ Add New</button>
+        </div>
+
+        <div class="cms-grid" id="cms-grid">
+            <!-- Content will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h2 id="modal-title" style="margin-bottom: 25px;">Add New Item</h2>
+            <form id="cms-form">
+                <input type="hidden" id="edit-id">
+                <div class="form-group" id="group-icon">
+                    <label>FontAwesome Icon (e.g. fa-video)</label>
+                    <input type="text" id="item-icon">
+                </div>
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="item-title" required>
+                </div>
+                <div class="form-group" id="group-price">
+                    <label>Price (e.g. $50)</label>
+                    <input type="text" id="item-price">
+                </div>
+                <div class="form-group" id="group-category">
+                    <label>Category</label>
+                    <input type="text" id="item-category">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="item-desc" rows="3"></textarea>
+                </div>
+                <div class="form-group" id="group-img">
+                    <label>Image URL</label>
+                    <input type="text" id="item-img">
+                </div>
+                <div class="form-group" id="group-features">
+                    <label>Features (Comma separated)</label>
+                    <textarea id="item-features" rows="3"></textarea>
+                </div>
+                
+                <div class="modal-btns">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-save">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+        // Firebase Config (Same as index.html)
+        const firebaseConfig = {
+          apiKey: "AIzaSyA9Y8FP_nZOwAPs8GqRpd5NkSzN0IXpIvA",
+          authDomain: "biman-portfolio.firebaseapp.com",
+          projectId: "biman-portfolio",
+          storageBucket: "biman-portfolio.firebasestorage.app",
+          messagingSenderId: "649941396027",
+          appId: "1:649941396027:web:b5b23dd80946315b97ca1e",
+          measurementId: "G-6GWRS2GLT2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let currentTab = 'packages';
+
+        window.checkLogin = () => {
+            const pass = document.getElementById('admin-pass').value;
+            if(pass === 'admin2026') { // Simple pass for now
+                document.getElementById('login-screen').style.display = 'none';
+                loadContent();
+            } else {
+                alert('Wrong Password!');
+            }
+        };
+
+        window.switchTab = (tab) => {
+            currentTab = tab;
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('tab-title').innerText = `Manage ${tab.charAt(0).toUpperCase() + tab.slice(1)}`;
+            
+            // Adjust form fields based on tab
+            document.getElementById('group-icon').style.display = tab === 'packages' ? 'block' : 'none';
+            document.getElementById('group-price').style.display = tab === 'packages' ? 'block' : 'none';
+            document.getElementById('group-category').style.display = (tab === 'blog' || tab === 'projects') ? 'block' : 'none';
+            document.getElementById('group-img').style.display = (tab === 'blog' || tab === 'projects') ? 'block' : 'none';
+            document.getElementById('group-features').style.display = tab === 'packages' ? 'block' : 'none';
+
+            loadContent();
+        };
+
+        async function loadContent() {
+            const grid = document.getElementById('cms-grid');
+            grid.innerHTML = '<p>Loading...</p>';
+            
+            try {
+                const q = query(collection(db, currentTab));
+                const querySnapshot = await getDocs(q);
+                grid.innerHTML = '';
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const card = document.createElement('div');
+                    card.className = 'cms-card';
+                    card.innerHTML = `
+                        ${data.img ? `<img src="${data.img}" alt="">` : ''}
+                        <h3>${data.title}</h3>
+                        <p>${data.desc || ''}</p>
+                        <div class="card-actions">
+                            <button class="btn-edit" onclick="editItem('${doc.id}', ${JSON.stringify(data).replace(/"/g, '&quot;')})">Edit</button>
+                            <button class="btn-delete" onclick="deleteItem('${doc.id}')">Delete</button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (error) {
+                console.error(error);
+                grid.innerHTML = '<p>Error loading content.</p>';
+            }
+        }
+
+        window.openModal = () => {
+            document.getElementById('cms-form').reset();
+            document.getElementById('edit-id').value = '';
+            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('modal-title').innerText = `Add New ${currentTab.slice(0,-1)}`;
+        };
+
+        window.closeModal = () => {
+            document.getElementById('modal').style.display = 'none';
+        };
+
+        window.editItem = (id, data) => {
+            document.getElementById('edit-id').value = id;
+            document.getElementById('item-title').value = data.title;
+            document.getElementById('item-desc').value = data.desc || '';
+            if(data.icon) document.getElementById('item-icon').value = data.icon;
+            if(data.price) document.getElementById('item-price').value = data.price;
+            if(data.category) document.getElementById('item-category').value = data.category;
+            if(data.img) document.getElementById('item-img').value = data.img;
+            if(data.features) document.getElementById('item-features').value = data.features.join(', ');
+            
+            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('modal-title').innerText = `Edit ${currentTab.slice(0,-1)}`;
+        };
+
+        window.deleteItem = async (id) => {
+            if(confirm('Are you sure you want to delete this?')) {
+                await deleteDoc(doc(db, currentTab, id));
+                loadContent();
+            }
+        };
+
+        document.getElementById('cms-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('edit-id').value;
+            const data = {
+                title: document.getElementById('item-title').value,
+                desc: document.getElementById('item-desc').value,
+            };
+
+            if(currentTab === 'packages') {
+                data.icon = document.getElementById('item-icon').value;
+                data.price = document.getElementById('item-price').value;
+                data.features = document.getElementById('item-features').value.split(',').map(f => f.trim());
+            } else {
+                data.category = document.getElementById('item-category').value;
+                data.img = document.getElementById('item-img').value;
+            }
+
+            try {
+                if(id) {
+                    await updateDoc(doc(db, currentTab, id), data);
+                } else {
+                    await addDoc(collection(db, currentTab), data);
+                }
+                closeModal();
+                loadContent();
+            } catch (error) {
+                alert('Error saving data!');
+                console.error(error);
+            }
+        };
+
+    </script>
+</body>
+</html>

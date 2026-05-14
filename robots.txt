@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Disallow admin/backend
+Disallow: /nova_backend/
+Disallow: /min/
+Disallow: /digital/
+
+# Sitemap
+Sitemap: https://bimanranasinghe.com/sitemap.xml

@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Portal | StoVest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="lazy-load.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <style>
+        :root {
+            --bg-dark: #121316;
+            --bg-card: #1c1d22;
+            --bg-hover: #26272e;
+            --primary: #ccff00;
+            --text-main: #ffffff;
+            --text-muted: #8b92a5;
+            --border: rgba(255, 255, 255, 0.05);
+            --green: #ccff00;
+            --red: #ef4444;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+        }
+
+        .mobile-only {
+            display: none !important;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- LAYOUT --- */
+        .dashboard {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-dark);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 40px;
+            color: var(--text-main);
+            padding-left: 10px;
+        }
+        
+        .user-greeting {
+            margin-bottom: 40px;
+            padding-left: 10px;
+        }
+        
+        .user-greeting h3 {
+            font-size: 1.3rem;
+            font-weight: 300;
+            margin-bottom: 5px;
+        }
+        
+        .user-greeting h3 span {
+            font-weight: 600;
+        }
+        
+        .user-greeting p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-title {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            padding-left: 15px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 14px 15px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover {
+            color: var(--text-main);
+            background-color: var(--bg-hover);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary);
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .nav-item i {
+            width: 20px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 30px 40px;
+        }
+
+        .main-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .main-content::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+
+        /* Topbar */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .top-pills {
+            display: flex;
+            gap: 10px;
+        }
+
+        .top-pill {
+            padding: 10px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .top-pill:hover, .top-pill.active {
+            background: var(--bg-hover);
+            color: var(--text-main);
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 450px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+        
+        .search-bar input:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .icon-btn:hover {
+            color: var(--text-main);
+            background: var(--bg-hover);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: 10px;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info h4 {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .user-info p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* --- DASHBOARD GRID --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 25px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* Total Holding */
+        .total-holding-card {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        /* Subtle wave background for total holding */
+        .total-holding-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.03) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .holding-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+
+        .holding-return {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .holding-return span {
+            color: var(--green);
+            background: rgba(16, 185, 129, 0.1);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        /* My Portfolio Horizontal Scroll */
+        .portfolio-list {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: none;
+        }
+        
+        .portfolio-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .stock-card {
+            min-width: 130px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        
+        .stock-card:hover {
+            border-color: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
+        }
+
+        .stock-card-price {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .stock-card-change {
+            font-size: 0.75rem;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .stock-card-change.positive { color: var(--green); }
+        .stock-card-change.negative { color: var(--red); }
+
+        .stock-card-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+        
+        .stock-card-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.8rem;
+        }
+        
+        .stock-card-units {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Performance Chart */
+        .chart-card {
+            grid-column: 1 / -1;
+        }
+        
+        .chart-controls {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .chart-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chart-btn:hover, .chart-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 320px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* Bottom Grid */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        /* Table Styles */
+        .table-tabs {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .table-tab {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .table-tab:hover, .table-tab.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .data-table th {
+            text-align: left;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 15px 10px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        
+        .data-table td {
+            padding: 15px 10px;
+            font-size: 0.85rem;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .stock-name-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+        
+        .stock-name-cell i {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Watchlist */
+        .watchlist-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+        
+        .watchlist-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .watchlist-item:first-child {
+            padding-top: 10px;
+        }
+        
+        .wl-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .wl-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+        
+        .wl-info h5 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        
+        .wl-info p {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+        
+        .wl-right {
+            text-align: right;
+        }
+        
+        .wl-price {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .wl-change {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .wl-change.positive { color: var(--green); }
+        .wl-change.negative { color: var(--red); }
+
+        /* Mobile Nav */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(19, 21, 27, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border);
+            padding: 12px 20px;
+            z-index: 1000;
+            justify-content: space-around;
+        }
+        
+        .m-nav-item {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+        }
+        
+        .m-nav-item.active {
+            color: var(--primary);
+        }
+        
+        .m-nav-item i {
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+            .mobile-nav {
+                display: flex;
+                padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+            }
+            .main-content {
+                padding: 20px;
+                padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); /* space for mobile nav */
+            }
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-only {
+                display: flex !important;
+            }
+            .desktop-only {
+                display: none !important;
+            }
+            
+            .topbar {
+                flex-wrap: wrap;
+                gap: 15px;
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+            }
+            .search-bar {
+                order: 3;
+                max-width: 100%;
+                width: 100%;
+                margin-top: 5px;
+                display: none; /* Hide search on mobile */
+            }
+            
+            /* Neon Card Styling for Mobile */
+            .total-holding-card {
+                background: var(--primary);
+                color: #121316;
+                border: none;
+                box-shadow: 0 10px 30px rgba(204, 255, 0, 0.15);
+            }
+            .total-holding-card .card-title,
+            .total-holding-card .holding-amount,
+            .total-holding-card .holding-return,
+            .total-holding-card .holding-return span,
+            .total-holding-card i {
+                color: #121316 !important;
+            }
+            .total-holding-card .holding-return span {
+                background: rgba(0,0,0,0.1);
+            }
+            .total-holding-card .icon-btn {
+                border-color: rgba(0,0,0,0.2);
+                color: #121316;
+                background: transparent;
+            }
+
+            /* Quick actions styling */
+            .quick-actions {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 25px;
+                padding: 0 5px;
+            }
+            .action-btn {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                cursor: pointer;
+            }
+            .action-icon {
+                width: 55px;
+                height: 55px;
+                background: var(--bg-card);
+                border-radius: var(--radius-sm);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.3rem;
+                color: var(--text-main);
+            }
+            .action-btn span {
+                font-size: 0.75rem;
+                color: var(--text-muted);
+            }
+            .top-pills {
+                display: none;
+            }
+            .user-info {
+                display: none;
+            }
+            .holding-amount {
+                font-size: 1.8rem;
+            }
+            .card {
+                padding: 20px;
+            }
+            .chart-container {
+                height: 250px;
+            }
+            .portfolio-list {
+                gap: 10px;
+            }
+            .stock-card {
+                min-width: 120px;
+                padding: 14px;
+            }
+            .table-tabs {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 15px;
+                padding-bottom: calc(85px + env(safe-area-inset-bottom, 0px));
+            }
+            .user-profile img {
+                width: 35px;
+                height: 35px;
+            }
+            .icon-btn {
+                width: 35px;
+                height: 35px;
+            }
+            .card {
+                padding: 16px;
+            }
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .card-header > div {
+                align-self: flex-start;
+                width: 100%;
+            }
+            .chart-controls {
+                gap: 5px;
+                flex-wrap: wrap;
+            }
+            .chart-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 0.7rem;
+            }
+            .holding-amount {
+                font-size: 1.6rem;
+            }
+            .table-tab {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+            .data-table th, .data-table td {
+                padding: 12px 8px;
+            }
+            .watchlist-item {
+                padding: 12px 0;
+            }
+            .wl-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+            .wl-price {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" style="position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg-dark);display:flex;align-items:center;justify-content:center;z-index:9999;">
+        <div style="text-align:center;">
+            <div style="width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px;"></div>
+            <p style="color:var(--text-muted);">Loading your portfolio...</p>
+        </div>
+        <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+    </div>
+
+    <!-- Not Logged In Redirect -->
+    <div id="authError" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg-dark);align-items:center;justify-content:center;z-index:9998;padding:20px;text-align:center;">
+        <div>
+            <i class="fa-solid fa-lock" style="font-size:4rem;color:var(--primary);margin-bottom:20px;"></i>
+            <h2 style="margin-bottom:15px;">Access Restricted</h2>
+            <p style="color:var(--text-muted);margin-bottom:30px;">Please log in to view your portfolio</p>
+            <a href="client-login.html" style="background:var(--primary);color:var(--bg-dark);padding:14px 30px;border-radius:12px;text-decoration:none;font-weight:600;display:inline-block;">Go to Login</a>
+        </div>
+    </div>
+
+    <div class="dashboard" id="dashboardContent" style="display:none;">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                StoVest
+            </div>
+            
+            <div class="user-greeting">
+                <h3>Welcome, <span id="userName">User</span></h3>
+                <p>Here's your stock portfolio overview</p>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Main Menu</div>
+                <a href="#" class="nav-item active"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-briefcase"></i> Portfolio</a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i> Analysis</a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-globe"></i> Market</a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Support</div>
+                <a href="#" class="nav-item"><i class="fa-solid fa-users"></i> Community</a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-circle-question"></i> Help & Support</a>
+            </div>
+            
+            <a href="index.html" class="nav-item"><i class="fa-solid fa-arrow-left"></i> Back to Site</a>
+            <a href="#" class="nav-item" id="logoutBtn" style="margin-top: 10px;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="mobile-greeting mobile-only" style="align-items: center; gap: 12px; flex: 1;">
+                    <img src="https://i.postimg.cc/HxGJFn1m/Remove-the-fingers-202603231945.jpg" alt="User Profile" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
+                    <div>
+                        <p style="font-size: 0.75rem; color: var(--text-muted);">Good Morning</p>
+                        <h4 style="font-size: 1rem; font-weight: 600;" id="mobileUserName">User</h4>
+                    </div>
+                </div>
+
+                <div class="top-pills desktop-only">
+                    <button class="top-pill">Market</button>
+                    <button class="top-pill">Wallets</button>
+                    <button class="top-pill">Tools</button>
+                </div>
+                
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Ask stocks.ai anything">
+                </div>
+                
+                <div class="topbar-right">
+                    <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
+                    <button class="icon-btn desktop-only"><i class="fa-solid fa-gear"></i></button>
+                    <div class="user-profile desktop-only">
+                        <img src="https://i.postimg.cc/HxGJFn1m/Remove-the-fingers-202603231945.jpg" alt="User Profile">
+                        <div class="user-info">
+                            <h4 id="desktopUserName">User</h4>
+                            <p id="userEmail">email@example.com</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Grid Content -->
+            <div class="grid-container">
+                
+                <!-- Total Holding (My Cards on mobile) -->
+                <div class="mobile-section-header mobile-only" style="justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="font-size: 1.1rem; font-weight: 500;">My Cards</h3>
+                    <button style="background: var(--bg-card); color: var(--text-main); border: none; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem;">Add Card +</button>
+                </div>
+
+                <div class="card total-holding-card">
+                    <div class="card-header" style="margin-bottom: 10px;">
+                        <span class="card-title">VISA</span>
+                        <div style="display: flex; gap: 5px;">
+                            <i class="fa-solid fa-wifi" style="font-size: 1.2rem;"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="margin-bottom: 20px; font-size: 0.9rem; letter-spacing: 2px;">
+                            **** **** **** 5466 <i class="fa-regular fa-eye-slash" style="margin-left: 5px;"></i>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                            <div>
+                                <div style="font-size: 0.8rem; margin-bottom: 5px; opacity: 0.8;">Balance</div>
+                                <div class="holding-amount">$786,898,67.00</div>
+                            </div>
+                            <div style="width: 40px; height: 30px; border: 1px solid rgba(0,0,0,0.2); border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa-brands fa-cc-visa" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions (Mobile Only) -->
+                <div class="quick-actions mobile-only">
+                    <div class="action-btn">
+                        <div class="action-icon"><i class="fa-solid fa-arrow-up"></i></div>
+                        <span>Deposit</span>
+                    </div>
+                    <div class="action-btn">
+                        <div class="action-icon"><i class="fa-solid fa-arrow-down"></i></div>
+                        <span>Withdrawal</span>
+                    </div>
+                    <div class="action-btn">
+                        <div class="action-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                        <span>Loan</span>
+                    </div>
+                    <div class="action-btn">
+                        <div class="action-icon"><i class="fa-solid fa-wallet"></i></div>
+                        <span>Remit</span>
+                    </div>
+                </div>
+
+                <!-- My Portfolio -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">My Portfolio</span>
+                        <div style="display: flex; gap: 5px;">
+                            <button class="top-pill" style="padding: 6px 15px;">See all</button>
+                            <button class="icon-btn" style="width: 32px; height: 32px; font-size: 0.7rem;"><i class="fa-solid fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="portfolio-list">
+                        <!-- Stock 1 -->
+                        <div class="stock-card">
+                            <div class="stock-card-price">$ 1,721.3</div>
+                            <div class="stock-card-change positive">+2.3 (0.7%)</div>
+                            <div class="stock-card-bottom">
+                                <div class="stock-card-icon"><i class="fa-brands fa-apple"></i></div>
+                                <div class="stock-card-units">Units <b>104</b></div>
+                            </div>
+                        </div>
+                        <!-- Stock 2 -->
+                        <div class="stock-card">
+                            <div class="stock-card-price">$ 1,521.3</div>
+                            <div class="stock-card-change positive">+1.1 (0.2%)</div>
+                            <div class="stock-card-bottom">
+                                <div class="stock-card-icon" style="background: rgba(255,255,255,0.1);"><i class="fa-solid fa-t"></i></div>
+                                <div class="stock-card-units">Units <b>124</b></div>
+                            </div>
+                        </div>
+                        <!-- Stock 3 -->
+                        <div class="stock-card">
+                            <div class="stock-card-price">$ 1,721.3</div>
+                            <div class="stock-card-change negative">-0.3 (-0.1%)</div>
+                            <div class="stock-card-bottom">
+                                <div class="stock-card-icon" style="background: rgba(255,255,255,0.1);"><i class="fa-brands fa-microsoft"></i></div>
+                                <div class="stock-card-units">Units <b>10</b></div>
+                            </div>
+                        </div>
+                        <!-- Stock 4 -->
+                        <div class="stock-card">
+                            <div class="stock-card-price">$ 1,721.3</div>
+                            <div class="stock-card-change positive">+2.3 (0.7%)</div>
+                            <div class="stock-card-bottom">
+                                <div class="stock-card-icon"><i class="fa-brands fa-google"></i></div>
+                                <div class="stock-card-units">Units <b>110</b></div>
+                            </div>
+                        </div>
+                        <!-- Stock 5 -->
+                        <div class="stock-card">
+                            <div class="stock-card-price">$ 1,721.3</div>
+                            <div class="stock-card-change positive">+2.3 (0.7%)</div>
+                            <div class="stock-card-bottom">
+                                <div class="stock-card-icon" style="background: rgba(255,255,255,0.1);"><i class="fa-solid fa-n"></i></div>
+                                <div class="stock-card-units">Units <b>104</b></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Chart -->
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <span class="card-title">Portfolio Performance</span>
+                        <div class="chart-controls">
+                            <button class="chart-btn">1D</button>
+                            <button class="chart-btn">1W</button>
+                            <button class="chart-btn">1M</button>
+                            <button class="chart-btn active">6M</button>
+                            <button class="chart-btn">1Y</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Grid -->
+            <div class="bottom-grid">
+                
+                <!-- Portfolio Overview Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Portfolio Overview</span>
+                        <div class="table-tabs">
+                            <button class="table-tab active">All</button>
+                            <button class="table-tab">Gainers</button>
+                            <button class="table-tab">Losers</button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Stock</th>
+                                    <th>Last Price <i class="fa-solid fa-arrow-down-up-across-line" style="font-size: 0.6rem; margin-left:3px;"></i></th>
+                                    <th>Change <i class="fa-solid fa-arrow-down-up-across-line" style="font-size: 0.6rem; margin-left:3px;"></i></th>
+                                    <th>Market Cap <i class="fa-solid fa-arrow-down-up-across-line" style="font-size: 0.6rem; margin-left:3px;"></i></th>
+                                    <th>Volume <i class="fa-solid fa-arrow-down-up-across-line" style="font-size: 0.6rem; margin-left:3px;"></i></th>
+                                    <th>Last 7 days <i class="fa-solid fa-arrow-down-up-across-line" style="font-size: 0.6rem; margin-left:3px;"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="stock-name-cell">
+                                            <i class="fa-solid fa-t"></i> TSLA
+                                        </div>
+                                    </td>
+                                    <td>$26,000.21</td>
+                                    <td style="color: var(--green);">+3.4%</td>
+                                    <td>$564.06 B</td>
+                                    <td>$37.9 B</td>
+                                    <td style="color: var(--green);"><i class="fa-solid fa-arrow-trend-up"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="stock-name-cell">
+                                            <i class="fa-brands fa-apple" style="font-size: 1.3rem;"></i> AAPL
+                                        </div>
+                                    </td>
+                                    <td>$32,000.21</td>
+                                    <td style="color: var(--red);">-3.4%</td>
+                                    <td>$564.06 B</td>
+                                    <td>$37.9 B</td>
+                                    <td style="color: var(--red);"><i class="fa-solid fa-arrow-trend-down"></i></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Watchlist -->
+                <div class="card">
+                    <div class="card-header" style="margin-bottom: 15px;">
+                        <span class="card-title desktop-only">Watchlist</span>
+                        <div class="mobile-section-header mobile-only" style="width: 100%; justify-content: space-between; align-items: center;">
+                            <h3 style="font-size: 1.1rem; font-weight: 500;">Transactions</h3>
+                            <span style="color: var(--text-muted); font-size: 0.8rem;">View All</span>
+                        </div>
+                    </div>
+                    <div class="table-tabs" style="margin-bottom: 20px;">
+                        <button class="table-tab active" style="padding: 6px 12px; font-size: 0.75rem;">Most Viewed</button>
+                        <button class="table-tab" style="padding: 6px 12px; font-size: 0.75rem;">Gainers</button>
+                        <button class="table-tab" style="padding: 6px 12px; font-size: 0.75rem;">Losers</button>
+                    </div>
+                    
+                    <div class="watchlist-items">
+                        <div class="watchlist-item">
+                            <div class="wl-left">
+                                <div class="wl-icon"><i class="fa-brands fa-spotify"></i></div>
+                                <div class="wl-info">
+                                    <h5>Spotify</h5>
+                                    <p>NYSE: SPOT</p>
+                                </div>
+                            </div>
+                            <div class="wl-right">
+                                <div class="wl-price">$ 2,310.5</div>
+                                <div class="wl-change positive">+2.34%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="watchlist-item">
+                            <div class="wl-left">
+                                <div class="wl-icon"><i class="fa-brands fa-amazon"></i></div>
+                                <div class="wl-info">
+                                    <h5>Amazon</h5>
+                                    <p>NYSE: AMZN</p>
+                                </div>
+                            </div>
+                            <div class="wl-right">
+                                <div class="wl-price">$ 2,310.5</div>
+                                <div class="wl-change positive">+2.34%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+        </main>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <a href="#" class="m-nav-item active">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="m-nav-item">
+            <i class="fa-solid fa-chart-simple"></i>
+            <span>Statistic</span>
+        </a>
+        <a href="#" class="m-nav-item" style="position: relative; top: -15px;">
+            <div style="width: 45px; height: 45px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #121316; font-size: 1.3rem; box-shadow: 0 10px 20px rgba(204, 255, 0, 0.2);">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+        </a>
+        <a href="#" class="m-nav-item">
+            <i class="fa-solid fa-bullseye"></i>
+            <span>Target</span>
+        </a>
+        <a href="#" class="m-nav-item">
+            <i class="fa-solid fa-border-all"></i>
+            <span>Menu</span>
+        </a>
+    </nav>
+
+    <!-- Authentication & Data Loading -->
+    <script>
+        // Check authentication on page load
+        (function() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const authError = document.getElementById('authError');
+            const dashboardContent = document.getElementById('dashboardContent');
+
+            const token = sessionStorage.getItem('client_token') || localStorage.getItem('client_token');
+
+            if (token === 'demo-token') {
+                // User is authenticated - load data
+                const user = {
+                    full_name: "Biman Ranasinghe",
+                    email: "admin@biman.com"
+                };
+
+                // Update user info in UI
+                document.getElementById('userName').textContent = user.full_name.split(' ')[0];
+                document.getElementById('mobileUserName').textContent = user.full_name;
+                document.getElementById('desktopUserName').textContent = user.full_name;
+                document.getElementById('userEmail').textContent = user.email;
+
+                // Show dashboard, hide loading
+                loadingScreen.style.display = 'none';
+                dashboardContent.style.display = 'flex';
+
+                // Load portfolio data
+                if (typeof loadPortfolio === 'function') {
+                    loadPortfolio();
+                }
+            } else {
+                // Not authenticated
+                loadingScreen.style.display = 'none';
+                authError.style.display = 'flex';
+            }
+        })();
+
+        // Logout handler
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+
+            localStorage.removeItem('client_token');
+            sessionStorage.removeItem('client_token');
+            window.location.href = 'client-login.html';
+        });
+
+        // Load portfolio data
+        async function loadPortfolio() {
+            try {
+                const response = await fetch('nova_backend/client-auth.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get_portfolio' })
+                });
+
+                const data = await response.json();
+
+                if (data.success && (data.holdings.length > 0 || data.accounts.length > 0)) {
+                    updatePortfolioUI(data);
+                }
+            } catch (error) {
+                console.log('No portfolio data found, using defaults');
+            }
+        }
+
+        function updatePortfolioUI(data) {
+            // Update holdings if available
+            if (data.holdings && data.holdings.length > 0) {
+                const portfolioList = document.querySelector('.portfolio-list');
+                if (portfolioList) {
+                    portfolioList.innerHTML = '';
+                    data.holdings.forEach(holding => {
+                        const value = holding.shares * holding.current_price;
+                        const gain = ((holding.current_price - holding.avg_cost) / holding.avg_cost) * 100;
+                        const isPositive = gain >= 0;
+
+                        const stockCard = document.createElement('div');
+                        stockCard.className = 'stock-card';
+                        stockCard.innerHTML = `
+                            <div class="stock-card-price">$ ${holding.current_price.toFixed(2)}</div>
+                            <div class="stock-card-change ${isPositive ? 'positive' : 'negative'}">
+                                ${isPositive ? '+' : ''}${gain.toFixed(2)}%
+                            </div>
+                            <div class="stock-card-bottom">
+                                <div class="stock-card-icon"><i class="fa-solid fa-building"></i></div>
+                                <div class="stock-card-units">Units <b>${holding.shares}</b></div>
+                            </div>
+                        `;
+                        portfolioList.appendChild(stockCard);
+                    });
+                }
+            }
+
+            // Update account/holding card if available
+            if (data.accounts && data.accounts.length > 0) {
+                const totalBalance = data.accounts.reduce((sum, acc) => sum + parseFloat(acc.balance), 0);
+                const holdingAmount = document.querySelector('.holding-amount');
+                if (holdingAmount) {
+                    holdingAmount.textContent = '$ ' + totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                }
+            }
+        }
+    </script>
+
+    <!-- Chart Configuration -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            // Data to match the bar chart
+            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+            const dataPoints = [12000, 18000, 15000, 25000, 16000, 19000];
+            
+            // Highlight the highest bar with neon green
+            const bgColors = dataPoints.map(val => val === 25000 ? '#ccff00' : 'rgba(255,255,255,0.05)');
+            const hoverBgColors = dataPoints.map(val => val === 25000 ? '#ccff00' : 'rgba(255,255,255,0.1)');
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Portfolio Value',
+                        data: dataPoints,
+                        backgroundColor: bgColors,
+                        hoverBackgroundColor: hoverBgColors,
+                        borderRadius: 6,
+                        borderWidth: 0,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#13151b',
+                            titleColor: '#8b92a5',
+                            bodyColor: '#fff',
+                            bodyFont: {
+                                weight: 'bold',
+                                size: 14
+                            },
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return '$ ' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#8b92a5',
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255,255,255,0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#8b92a5',
+                                font: {
+                                    size: 10
+                                },
+                                callback: function(value) {
+                                    return value / 1000 + 'k';
+                                }
+                            },
+                            min: 0,
+                            max: 200000
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
